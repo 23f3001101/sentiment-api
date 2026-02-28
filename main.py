@@ -1,9 +1,18 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from openai import OpenAI
 import json, os
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 client = OpenAI(
     api_key=os.environ["GROQ_API_KEY"],
     base_url="https://api.groq.com/openai/v1"
@@ -26,7 +35,7 @@ async def analyze_comment(request: CommentRequest):
             messages=[
                 {
                     "role": "system",
-                    "content": "Analyze sentiment. Respond ONLY with valid JSON: {\"sentiment\": \"positive/negative/neutral\", \"rating\": 1-5}. No extra text."
+                    "content": 'Analyze sentiment. Respond ONLY with valid JSON: {"sentiment": "positive/negative/neutral", "rating": 1-5}. No extra text.'
                 },
                 {"role": "user", "content": request.comment}
             ],
